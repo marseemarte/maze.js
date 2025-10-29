@@ -11,6 +11,19 @@ let player = { x: 0, y: 0 };
 let maze, start, end;
 let timeLeft = 60;
 let timerInterval;
+const LEVEL_BACKGROUNDS = [
+  "img/level1.jpg",
+  "img/level2.jpg",
+  "img/level3.jpg"
+];
+
+function setBackgroundForLevel(levelIndex) {
+  const url = LEVEL_BACKGROUNDS[levelIndex] || LEVEL_BACKGROUNDS[0];
+  document.body.style.backgroundImage = `url('${url}')`;
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundRepeat = "no-repeat";
+  document.body.style.backgroundPosition = "center center";
+}
 
 startBtn.addEventListener("click", startGame);
 
@@ -18,7 +31,9 @@ function startGame() {
   menu.classList.add("hidden");
   game.classList.remove("hidden");
 
-  maze = getRandomMaze();
+  const { maze: selectedMaze, index: levelIndex } = getRandomMaze();
+  maze = selectedMaze;
+  setBackgroundForLevel(levelIndex);
   const pos = getPositions(maze);
   start = pos.start;
   end = pos.end;

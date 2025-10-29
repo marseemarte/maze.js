@@ -1,0 +1,63 @@
+body {
+  text-align: center;
+  background-color: #001f2b;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+#laberinto {
+  display: grid;
+  grid-template-columns: repeat(10, 40px);
+  grid-template-rows: repeat(10, 40px);
+  gap: 2px;
+  justify-content: center;
+  margin: 20px auto;
+}
+
+.celda {
+  width: 40px;
+  height: 40px;
+  background-color: #b2ebf2;
+  border: 1px solid #004d40;
+}
+
+.pared {
+  background-color: #00332d;
+}
+
+/* --- Sprite del jugador (slime) --- */
+.jugador {
+  background-image: url('slime_9frames_288x48.png');
+  background-size: 288px 48px; /* tamaño total del sprite */
+  animation: animarJugador 0.9s steps(9) infinite;
+}
+
+/* animación que recorre los 9 frames */
+@keyframes animarJugador {
+  from { background-position: 0 0; }
+  to { background-position: -288px 0; }
+}
+
+/* Monstruo jefe (se mantiene como imagen fija) */
+.jefe {
+  background-image: url('monster.png');
+  background-size: cover;
+  animation: mover 0.5s infinite alternate;
+}
+
+@keyframes mover {
+  from { transform: scale(1); }
+  to { transform: scale(1.2); }
+}
+
+/* Salida */
+.salida {
+  background-color: gold;
+  border-radius: 6px;
+  box-shadow: 0 0 10px yellow;
+}
+
+#mensaje {
+  font-size: 1.5em;
+  margin-top: 15px;
+}
