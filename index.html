@@ -4,22 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maze.js</title>
-  <link rel="stylesheet" href="css/maze.css">
+  <link rel="stylesheet" href="maze.css">
+  <script src="maze.js" defer></script>
 </head>
 <body>
   <div id="menu">
-    <h1>MAZE.<span>JS</span></h1>
-    <button id="startBtn">EMPEZAR</button>
+    <h1>Maze.js</h1>
+    <button id="startBtn">Empezar</button>
   </div>
 
-  <div id="game" class="hidden">
-    <canvas id="mazeCanvas" width="400" height="400"></canvas>
-    <div class="info">
-      <p id="level">Nivel: 1</p>
-      <p id="timer">Tiempo: 60s</p>
-    </div>
+  <div id="hud">
+    <span id="lives">Vidas: 3</span>
+    <span id="timer">Tiempo: 0s</span>
   </div>
 
-  <script type="module" src="js/game.js"></script>
+  <canvas id="gameCanvas" width="700" height="700"></canvas>
 </body>
 </html>
