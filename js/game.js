@@ -12,9 +12,9 @@ let maze, start, end;
 let timeLeft = 60;
 let timerInterval;
 const LEVEL_BACKGROUNDS = [
-  "img/level1.jpg",
-  "img/level2.jpg",
-  "img/level3.jpg"
+  "img/nivel1.jpg",
+  "img/nivel2.jpg",
+  "img/nivel3.jpg"
 ];
 
 function setBackgroundForLevel(levelIndex) {
