@@ -1,63 +1,71 @@
 body {
-  text-align: center;
   background-color: #001f2b;
   color: white;
   font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+  margin: 0;
 }
 
-#laberinto {
-  display: grid;
-  grid-template-columns: repeat(10, 40px);
-  grid-template-rows: repeat(10, 40px);
-  gap: 2px;
-  justify-content: center;
-  margin: 20px auto;
+.hidden {
+  display: none;
 }
 
-.celda {
-  width: 40px;
-  height: 40px;
-  background-color: #b2ebf2;
-  border: 1px solid #004d40;
+#menu {
+  margin-top: 150px;
 }
 
-.pared {
-  background-color: #00332d;
+#menu h1 {
+  font-size: 3em;
+  letter-spacing: 3px;
 }
 
-/* --- Sprite del jugador (slime) --- */
-.jugador {
-  background-image: url('slime_9frames_288x48.png');
-  background-size: 288px 48px; /* tamaño total del sprite */
-  animation: animarJugador 0.9s steps(9) infinite;
+#menu span {
+  color: #00ffff;
 }
 
-/* animación que recorre los 9 frames */
-@keyframes animarJugador {
+#menu button {
+  font-size: 1.2em;
+  padding: 10px 30px;
+  background: #00ccff;
+  color: #001f2b;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
+}
+
+canvas {
+  background: #002b36;
+  image-rendering: pixelated;
+  border: 3px solid #00ccff;
+}
+
+/* --- SPRITE ANIMADO DEL JUGADOR --- */
+.player {
+  width: 32px;
+  height: 48px;
+  background-image: url("../assets/slime_9frames_288x48.png");
+  background-size: 288px 48px;
+  animation: animPlayer 0.9s steps(9) infinite;
+}
+
+@keyframes animPlayer {
   from { background-position: 0 0; }
   to { background-position: -288px 0; }
 }
 
-/* Monstruo jefe (se mantiene como imagen fija) */
-.jefe {
-  background-image: url('monster.png');
-  background-size: cover;
-  animation: mover 0.5s infinite alternate;
+/* HUD */
+.info {
+  margin-top: 10px;
+  font-size: 1.2em;
 }
 
-@keyframes mover {
-  from { transform: scale(1); }
-  to { transform: scale(1.2); }
-}
-
-/* Salida */
-.salida {
-  background-color: gold;
-  border-radius: 6px;
-  box-shadow: 0 0 10px yellow;
-}
-
-#mensaje {
-  font-size: 1.5em;
-  margin-top: 15px;
+#timer {
+  color: #00ff88;
 }
