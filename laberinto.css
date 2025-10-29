@@ -37,9 +37,9 @@ body {
 }
 
 .jefe {
-  background-image: url("boos2.png"); /* versión sin fondo */
+  background-image: url(monster.png); /* versión sin fondo */
   background-size: cover;
-  animation: mover 1s infinite alternate;
+  animation: mover 0.5s infinite alternate;
 }
 
 @keyframes mover {
