@@ -7,10 +7,11 @@ const mapa = [
   [1,0,1,0,1,1,0,0,0,1],
   [1,0,0,0,0,0,1,0,1,1],
   [1,1,1,1,1,0,1,0,0,1],
-  [1,0,0,0,1,0,0,0,0,1],
-  [1,0,1,0,0,0,1,0,2,1], // 2 = salida
-  [1,1,1,1,1,1,1,1,1,1]
+  [1,0,0,0,1,0,0,0,0,0],
+  [1,2,1,0,0,0,1,0,2,0],
+  [1,1,1,1,1,1,1,0,0,0]
 ];
+
 const laberinto = document.getElementById('laberinto');
 const mensaje = document.getElementById('mensaje');
 
@@ -54,7 +55,6 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 's') nuevoY++;
   if (e.key === 'a') nuevoX--;
   if (e.key === 'd') nuevoX++;
-  
 
   // Verificar límites y paredes
   if (mapa[nuevoY][nuevoX] === 0 || mapa[nuevoY][nuevoX] === 2) {

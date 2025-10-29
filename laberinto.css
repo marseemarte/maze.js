@@ -25,19 +25,22 @@ body {
   background-color: #00332d;
 }
 
+/* --- Sprite del jugador (slime) --- */
 .jugador {
-  background-color: #00bcd4;
-  border-radius: 8px;
-  animation: parpadeo 0.6s infinite alternate;
+  background-image: url('slime_9frames_288x48.png');
+  background-size: 288px 48px; /* tamaño total del sprite */
+  animation: animarJugador 0.9s steps(9) infinite;
 }
 
-@keyframes parpadeo {
-  from { transform: scale(1); opacity: 1; }
-  to { transform: scale(1.1); opacity: 0.7; }
+/* animación que recorre los 9 frames */
+@keyframes animarJugador {
+  from { background-position: 0 0; }
+  to { background-position: -288px 0; }
 }
 
+/* Monstruo jefe (se mantiene como imagen fija) */
 .jefe {
-  background-image: url(monster.png); /* versión sin fondo */
+  background-image: url('monster.png');
   background-size: cover;
   animation: mover 0.5s infinite alternate;
 }
@@ -47,6 +50,7 @@ body {
   to { transform: scale(1.2); }
 }
 
+/* Salida */
 .salida {
   background-color: gold;
   border-radius: 6px;
