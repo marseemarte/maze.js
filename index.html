@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maze.js</title>
+  <link rel="stylesheet" href="css/maze.css">
+</head>
+<body>
+  <div id="menu">
+    <h1>MAZE.<span>JS</span></h1>
+    <button id="startBtn">EMPEZAR</button>
+  </div>
+
+  <div id="game" class="hidden">
+    <canvas id="mazeCanvas" width="400" height="400"></canvas>
+    <div class="info">
+      <p id="level">Nivel: 1</p>
+      <p id="timer">Tiempo: 60s</p>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>

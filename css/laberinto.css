@@ -1,0 +1,59 @@
+body {
+  text-align: center;
+  background-color: #001f2b;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+#laberinto {
+  display: grid;
+  grid-template-columns: repeat(10, 40px);
+  grid-template-rows: repeat(10, 40px);
+  gap: 2px;
+  justify-content: center;
+  margin: 20px auto;
+}
+
+.celda {
+  width: 40px;
+  height: 40px;
+  background-color: #b2ebf2;
+  border: 1px solid #004d40;
+}
+
+.pared {
+  background-color: #00332d;
+}
+
+.jugador {
+  background-color: #00bcd4;
+  border-radius: 8px;
+  animation: parpadeo 0.6s infinite alternate;
+}
+
+@keyframes parpadeo {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(1.1); opacity: 0.7; }
+}
+
+.jefe {
+  background-image: url(monster.png); /* versión sin fondo */
+  background-size: cover;
+  animation: mover 0.5s infinite alternate;
+}
+
+@keyframes mover {
+  from { transform: scale(1); }
+  to { transform: scale(1.2); }
+}
+
+.salida {
+  background-color: gold;
+  border-radius: 6px;
+  box-shadow: 0 0 10px yellow;
+}
+
+#mensaje {
+  font-size: 1.5em;
+  margin-top: 15px;
+}
