@@ -10,23 +10,8 @@ let cols = 0;
 let player = { x: 1, y: 1 };
 let goal = { x: 1, y: 1 };
 
-// Imágenes del jugador
-const playerImg = new Image();
-playerImg.src = 'img/frente.png';
-const playerDownImg = new Image();
-playerDownImg.src = 'img/abajoo.png';
-const playerUpImg = new Image();
-playerUpImg.src = 'img/arriba.png';
-const playerLeftImg = new Image();
-playerLeftImg.src = 'img/izquierda.png';
-const playerRightImg = new Image();
-playerRightImg.src = 'img/derecha.png';
-
-// currentPlayerImg es la imagen que se dibuja cada frame
-let currentPlayerImg = playerImg;
-
 let lives = 3;
-let time = 60;
+let time = 0;
 let timerInterval = null;
 
 // --- Generador de laberinto: recursive backtracker sobre una grilla con celdas impares ---
@@ -76,21 +61,16 @@ function generateMaze(r, c) {
 }
 
 function setupCanvasAndMaze() {
-  // Definir el número deseado de celdas
-  const targetCols = 25;
-  const targetRows = 25;
-  
-  // Calcular el tamaño de celda basado en el espacio disponible
-  const maxW = Math.min(640, Math.floor(window.innerWidth * 0.9));
-  const maxH = Math.min(640, Math.floor(window.innerHeight * 0.7));
-  cellSize = Math.floor(Math.min(maxW / targetCols, maxH / targetRows));
-  cellSize = Math.max(18, Math.min(28, cellSize)); // ajustado para el nuevo tamaño
+  // ajustar canvas al tamaño real de la ventana
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-  // Ajustar el tamaño del canvas para que sea múltiplo exacto del tamaño de celda
-  cols = targetCols;
-  rows = targetRows;
-  canvas.width = cols * cellSize;
-  canvas.height = rows * cellSize;
+  // objetivo: muchas celdas en pantalla -> elegir cellSize pequeño acorde al tamaño
+  // intentamos tener ~40 columnas y ~25 filas como referencia
+  const targetCols = 40;
+  const targetRows = 25;
+  const computedSize = Math.floor(Math.min(canvas.width / targetCols, canvas.height / targetRows));
+  cellSize = Math.max(12, Math.min(40, computedSize)); // entre 12 y 40 px
 
   cols = Math.floor(canvas.width / cellSize);
   rows = Math.floor(canvas.height / cellSize);
@@ -128,14 +108,17 @@ function drawMaze() {
   ctx.fillStyle = "green";
   ctx.fillRect(goal.x * cellSize, goal.y * cellSize, cellSize, cellSize);
 
-  // Jugador (imagen)
-  ctx.drawImage(
-    currentPlayerImg,
-    player.x * cellSize,
-    player.y * cellSize,
-    cellSize,
-    cellSize
+  // Jugador (círculo)
+  ctx.fillStyle = "yellow";
+  ctx.beginPath();
+  ctx.arc(
+    player.x * cellSize + cellSize / 2,
+    player.y * cellSize + cellSize / 2,
+    Math.max(4, cellSize / 3),
+    0,
+    Math.PI * 2
   );
+  ctx.fill();
 }
 
 function isWall(x, y) {
@@ -148,23 +131,18 @@ function movePlayer(dx, dy) {
   const newY = player.y + dy;
 
   if (isWall(newX, newY)) {
-    // Si toca pared, reducir vidas
+    // Toca pared → pierde vida
     lives--;
     const livesEl = document.getElementById("lives");
     if (livesEl) livesEl.textContent = "Vidas: " + lives;
-    
     if (lives <= 0) {
-      clearInterval(timerInterval);
-      const gameOverModal = document.getElementById('gameOverModal');
-      if (gameOverModal) {
-        gameOverModal.style.display = 'flex';
-      }
-      const hud = document.getElementById("hud");
-      if (hud) hud.style.display = "none";
-      canvas.style.display = "none";
-      return;
+      alert("Perdiste todas las vidas 😢 Reiniciando nivel...");
+      resetGame();
+    } else {
+      alert("¡Cuidado! Tocaste una pared. Te quedan " + lives + " vidas.");
+      player = { x: 1, y: 1 };
     }
-    player = { x: 1, y: 1 };
+    drawMaze();
     return;
   }
 
@@ -173,14 +151,8 @@ function movePlayer(dx, dy) {
 
   if (player.x === goal.x && player.y === goal.y) {
     clearInterval(timerInterval);
-    // Mostrar modal de victoria
-    const victoriaModal = document.getElementById('victoriaModal');
-    const tiempoRestante = document.getElementById('tiempoRestante');
-    if (victoriaModal && tiempoRestante) {
-      tiempoRestante.textContent = time;
-      victoriaModal.style.display = 'flex';
-    }
-    return;
+    alert(`¡Ganaste! Tiempo final: ${time} segundos`);
+    resetGame();
   }
 
   drawMaze();
@@ -188,30 +160,16 @@ function movePlayer(dx, dy) {
 
 function resetGame() {
   setupCanvasAndMaze();
-  currentPlayerImg = playerImg; // Asegurar que mire al frente al iniciar
   lives = 3;
-  time = 60;
+  time = 0;
   const livesEl = document.getElementById("lives");
   if (livesEl) livesEl.textContent = "Vidas: 3";
   const timerEl = document.getElementById("timer");
-  if (timerEl) timerEl.textContent = "Tiempo: " + time + "s";
+  if (timerEl) timerEl.textContent = "Tiempo: 0s";
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
-    time--;
+    time++;
     if (timerEl) timerEl.textContent = "Tiempo: " + time + "s";
-    
-    // Verificar si se acabó el tiempo
-    if (time <= 0) {
-      clearInterval(timerInterval);
-      // Mostrar modal de Game Over
-      const gameOverModal = document.getElementById('gameOverModal');
-      if (gameOverModal) {
-        gameOverModal.style.display = 'flex';
-      }
-      const hud = document.getElementById("hud");
-      if (hud) hud.style.display = "none";
-      canvas.style.display = "none";
-    }
   }, 1000);
   drawMaze();
 }
@@ -219,29 +177,11 @@ function resetGame() {
 // Atajos de teclado
 document.addEventListener("keydown", (e) => {
   switch (e.key) {
-    case "ArrowUp": 
-      currentPlayerImg = playerUpImg;
-      movePlayer(0, -1); 
-      break;
-    case "ArrowDown": 
-      currentPlayerImg = playerDownImg;
-      movePlayer(0, 1); 
-      break;
-    case "ArrowLeft": 
-      currentPlayerImg = playerLeftImg;
-      movePlayer(-1, 0); 
-      break;
-    case "ArrowRight": 
-      currentPlayerImg = playerRightImg;
-      movePlayer(1, 0); 
-      break;
+    case "ArrowUp": movePlayer(0, -1); break;
+    case "ArrowDown": movePlayer(0, 1); break;
+    case "ArrowLeft": movePlayer(-1, 0); break;
+    case "ArrowRight": movePlayer(1, 0); break;
   }
-});
-
-// Volver a la imagen de frente cuando se suelta la tecla
-document.addEventListener("keyup", () => {
-  currentPlayerImg = playerImg;
-  drawMaze();
 });
 
 // Start button
@@ -254,19 +194,6 @@ if (startBtn) {
     if (hud) hud.style.display = "flex";
     canvas.style.display = "block";
     resetGame();
-  });
-}
-
-// Back button
-const backBtn = document.getElementById("backBtn");
-if (backBtn) {
-  backBtn.addEventListener("click", () => {
-    clearInterval(timerInterval);
-    const menu = document.getElementById("menu");
-    const hud = document.getElementById("hud");
-    if (menu) menu.style.display = "block";
-    if (hud) hud.style.display = "none";
-    canvas.style.display = "none";
   });
 }
 
