@@ -3,21 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maze.js</title>
+  <title>MAZE.JS - Run. Debug. Escape.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Press Start 2P', cursive;
+      background: linear-gradient(135deg, #1a0a0a 0%, #2d1400 100%);
+      overflow: hidden;
+    }
+    #gameCanvas {
+      border: 4px solid #ffd700;
+      box-shadow: 0 0 20px rgba(255,215,0,0.5), inset 0 0 20px rgba(255,215,0,0.3);
+      background: #000; /* el propio juego pinta el contenido */
+      display: none; /* visible tras empezar */
+    }
+    .glow-text {
+      text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6), 0 0 30px rgba(255,255,255,0.4);
+    }
+  </style>
   <link rel="stylesheet" href="maze.css">
-  <script src="maze.js" defer></script>
+  <script type="module" src="js/game.js"></script>
 </head>
 <body>
-  <div id="menu">
-    <h1>Maze.js</h1>
-    <button id="startBtn">Empezar</button>
-  </div>
+  <div class="min-h-screen flex flex-col items-center justify-center p-4">
+    <!-- Título + Botón central -->
+    <div id="menu" class="text-center mb-10">
+      <h1 class="text-6xl md:text-8xl text-white glow-text mb-6">MAZE<span class="text-yellow-400">.JS</span></h1>
+      <p class="text-sm md:text-base text-white/80 tracking-wider mb-8">RUN. DEBUG. ESCAPE.</p>
+      <button id="startBtn" class="px-10 py-5 bg-yellow-400 text-black text-lg md:text-xl hover:bg-yellow-300 transition-all hover:scale-110 hover:shadow-lg hover:shadow-yellow-400/50 active:scale-95">INICIAR</button>
+    </div>
 
-  <div id="hud">
-    <span id="lives">Vidas: 3</span>
-    <span id="timer">Tiempo: 0s</span>
-  </div>
+    <!-- Panel de Información -->
+    <div id="hud" class="hidden mb-6 flex items-center gap-8 text-white">
+      <div class="text-center">
+        <div class="text-xs md:text-sm text-red-400 mb-2">VIDAS</div>
+        <div id="lives" class="text-xl md:text-2xl text-white">Vidas: 3</div>
+      </div>
+      <div class="text-center">
+        <div class="text-xs md:text-sm text-green-400 mb-2">TIEMPO</div>
+        <div id="timer" class="text-xl md:text-2xl text-white">Tiempo: 0s</div>
+      </div>
+      <button id="backBtn" class="ml-4 px-4 py-2 bg-white/10 text-white text-sm border border-white/20 hover:bg-white/20 transition">Volver</button>
+    </div>
 
-  <canvas id="gameCanvas" width="700" height="700"></canvas>
+    <!-- Canvas del Juego -->
+    <div class="relative">
+      <canvas id="gameCanvas" width="640" height="640" class="mx-auto" style="max-width: 90vw; max-height: 70vh;"></canvas>
+    </div>
+
+    <!-- Controles -->
+    <div class="mt-6 text-center">
+      <p class="text-xs text-white/60 mb-2">Controles:</p>
+      <div class="flex gap-4 justify-center text-xs text-white/60">
+        <kbd class="px-2 py-1 bg-white/10 rounded">↑</kbd>
+        <kbd class="px-2 py-1 bg-white/10 rounded">↓</kbd>
+        <kbd class="px-2 py-1 bg-white/10 rounded">←</kbd>
+        <kbd class="px-2 py-1 bg-white/10 rounded">→</kbd>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
