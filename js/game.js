@@ -17,6 +17,13 @@ let monsterInterval = null;
 const monsterImg = new Image();
 monsterImg.src = 'img/monster.png';
 
+// Efectos de sonido (coloca los archivos en audio/)
+const sfxWin = new Audio('ganaste2.mp3');
+const sfxLose = new Audio('PERDISTE2.mp3');
+// Ajustes por defecto
+sfxWin.volume = 0.9;
+sfxLose.volume = 0.9;
+
 // Configuración de niveles
 const levels = [
   { 
@@ -190,11 +197,16 @@ function moveMonsters() {
         clearInterval(timerInterval);
         clearInterval(monsterInterval);
 
+        // reproducir sonido de derrota (intentar, si el usuario ya interactuó se permitirá)
+        try { sfxLose.currentTime = 0; sfxLose.play(); } catch(e) {}
+
         const gameOverModal = document.getElementById('gameOverModal');
         const hud = document.getElementById("hud");
         if (gameOverModal) {
           gameOverModal.style.display = 'flex';
+          // asignar click que detenga el sonido y reinicie
           gameOverModal.onclick = () => {
+            try { sfxLose.pause(); sfxLose.currentTime = 0; } catch(e) {}
             gameOverModal.style.display = 'none';
             if (hud) hud.style.display = "flex";
             canvas.style.display = "block";
@@ -326,9 +338,12 @@ function movePlayer(dx, dy) {
     const hud = document.getElementById("hud");
     
     if (victoriaModal) {
+      // reproducir sonido de victoria
+      try { sfxWin.currentTime = 0; sfxWin.play(); } catch(e) {}
       victoriaModal.style.display = 'flex';
-      // Remover evento click anterior si existe
+      // asignar click que detenga el sonido y reinicie
       victoriaModal.onclick = () => {
+        try { sfxWin.pause(); sfxWin.currentTime = 0; } catch(e) {}
         victoriaModal.style.display = 'none';
         if (hud) hud.style.display = "flex";
         canvas.style.display = "block";
@@ -368,6 +383,9 @@ function resetGame() {
   
   const timerEl = document.getElementById("timer");
   if (timerEl) timerEl.textContent = "Tiempo: " + time + "s";
+  // detener/rewindear efectos de sonido si estaban sonando
+  try { sfxWin.pause(); sfxWin.currentTime = 0; } catch(e) {}
+  try { sfxLose.pause(); sfxLose.currentTime = 0; } catch(e) {}
   
   // Reiniciar el temporizador
   if (timerInterval) {
@@ -381,15 +399,18 @@ function resetGame() {
     if (time <= 0) {
       clearInterval(timerInterval);
       clearInterval(monsterInterval);
-      
+      // reproducir sonido de derrota
+      try { sfxLose.currentTime = 0; sfxLose.play(); } catch(e) {}
+
       // Mostrar modal de Game Over
       const gameOverModal = document.getElementById('gameOverModal');
       const hud = document.getElementById("hud");
       
       if (gameOverModal) {
         gameOverModal.style.display = 'flex';
-        // Remover evento click anterior si existe
+        // asignar click que detenga el sonido y reinicie
         gameOverModal.onclick = () => {
+          try { sfxLose.pause(); sfxLose.currentTime = 0; } catch(e) {}
           gameOverModal.style.display = 'none';
           if (hud) hud.style.display = "flex";
           canvas.style.display = "block";
