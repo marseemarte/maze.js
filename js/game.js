@@ -288,7 +288,23 @@ function movePlayer(dx, dy) {
   const newY = player.y + dy;
 
   if (isWall(newX, newY)) {
-    // Si toca pared, simplemente no se mueve
+    // Si toca pared, reducir vidas
+    lives--;
+    const livesEl = document.getElementById("lives");
+    if (livesEl) livesEl.textContent = "Vidas: " + lives;
+    
+    if (lives <= 0) {
+      clearInterval(timerInterval);
+      const gameOverModal = document.getElementById('gameOverModal');
+      if (gameOverModal) {
+        gameOverModal.style.display = 'flex';
+      }
+      const hud = document.getElementById("hud");
+      if (hud) hud.style.display = "none";
+      canvas.style.display = "none";
+      return;
+    }
+    player = { x: 1, y: 1 };
     return;
   }
 
@@ -297,8 +313,14 @@ function movePlayer(dx, dy) {
 
   if (player.x === goal.x && player.y === goal.y) {
     clearInterval(timerInterval);
-    alert(`¡Ganaste el nivel ${currentLevel}! Te quedaban ${time} segundos`);
-    resetGame();
+    // Mostrar modal de victoria
+    const victoriaModal = document.getElementById('victoriaModal');
+    const tiempoRestante = document.getElementById('tiempoRestante');
+    if (victoriaModal && tiempoRestante) {
+      tiempoRestante.textContent = time;
+      victoriaModal.style.display = 'flex';
+    }
+    return;
   }
 
   drawMaze();
@@ -339,10 +361,12 @@ function resetGame() {
     
     if (time <= 0) {
       clearInterval(timerInterval);
-      alert("¡PERDISTE! Se acabó el tiempo");
-      const menu = document.getElementById("menu");
+      // Mostrar modal de Game Over
+      const gameOverModal = document.getElementById('gameOverModal');
+      if (gameOverModal) {
+        gameOverModal.style.display = 'flex';
+      }
       const hud = document.getElementById("hud");
-      if (menu) menu.style.display = "block";
       if (hud) hud.style.display = "none";
       canvas.style.display = "none";
     }
