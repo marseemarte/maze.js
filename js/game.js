@@ -9,6 +9,38 @@ let cols = 0;
 
 let player = { x: 1, y: 1 };
 let goal = { x: 1, y: 1 };
+let currentLevel = 1;
+let monsters = [];
+let monsterInterval = null;
+
+// Imagen del monstruo
+const monsterImg = new Image();
+monsterImg.src = 'img/monster.png';
+
+// Configuración de niveles
+const levels = [
+  { 
+    rows: 25, 
+    cols: 25, 
+    time: 60,
+    monsters: 0,
+    monsterSpeed: 0
+  },
+  { 
+    rows: 29, 
+    cols: 29, 
+    time: 60,
+    monsters: 1,
+    monsterSpeed: 300  // Velocidad en ms (más alto = más lento)
+  },
+  { 
+    rows: 33, 
+    cols: 33, 
+    time: 60,
+    monsters: 3,
+    monsterSpeed: 200  // Más rápido que en nivel 2
+  }
+];
 
 // Imágenes del jugador
 const playerImg = new Image();
@@ -75,30 +107,124 @@ function generateMaze(r, c) {
   return grid;
 }
 
+function createMonster() {
+  // Encontrar una posición válida para el monstruo
+  let x, y;
+  do {
+    x = Math.floor(Math.random() * (cols - 2)) + 1;
+    y = Math.floor(Math.random() * (rows - 2)) + 1;
+  } while (maze[y][x] === 1 || (x === player.x && y === player.y) || (x === goal.x && y === goal.y));
+  
+  return { x, y };
+}
+
+function moveMonsters() {
+  for (let monster of monsters) {
+    // Calcular dirección hacia el jugador
+    const dx = Math.sign(player.x - monster.x);
+    const dy = Math.sign(player.y - monster.y);
+    
+    // Priorizar el movimiento en la dirección que está más lejos del jugador
+    const distX = Math.abs(player.x - monster.x);
+    const distY = Math.abs(player.y - monster.y);
+    
+    if (distX > distY) {
+      // Intentar moverse horizontalmente primero
+      if (!isWall(monster.x + dx, monster.y)) {
+        monster.x += dx;
+      } 
+      // Si no puede, intentar verticalmente
+      else if (!isWall(monster.x, monster.y + dy)) {
+        monster.y += dy;
+      }
+      // Si ambas direcciones están bloqueadas, buscar camino alternativo
+      else {
+        const possibleMoves = [
+          {x: 0, y: 1},
+          {x: 0, y: -1},
+          {x: -dx, y: 0} // Dirección opuesta como última opción
+        ].filter(move => !isWall(monster.x + move.x, monster.y + move.y));
+        
+        if (possibleMoves.length > 0) {
+          // Elegir el primer movimiento disponible (más directo)
+          const move = possibleMoves[0];
+          monster.x += move.x;
+          monster.y += move.y;
+        }
+      }
+    } else {
+      // Intentar moverse verticalmente primero
+      if (!isWall(monster.x, monster.y + dy)) {
+        monster.y += dy;
+      }
+      // Si no puede, intentar horizontalmente
+      else if (!isWall(monster.x + dx, monster.y)) {
+        monster.x += dx;
+      }
+      // Si ambas direcciones están bloqueadas, buscar camino alternativo
+      else {
+        const possibleMoves = [
+          {x: 1, y: 0},
+          {x: -1, y: 0},
+          {x: 0, y: -dy} // Dirección opuesta como última opción
+        ].filter(move => !isWall(monster.x + move.x, monster.y + move.y));
+        
+        if (possibleMoves.length > 0) {
+          // Elegir el primer movimiento disponible (más directo)
+          const move = possibleMoves[0];
+          monster.x += move.x;
+          monster.y += move.y;
+        }
+      }
+    }
+    
+    // Verificar colisión con el jugador
+    if (monster.x === player.x && monster.y === player.y) {
+      clearInterval(timerInterval);
+      clearInterval(monsterInterval);
+      alert("¡Te atraparon los monstruos! Fin del juego.");
+      const menu = document.getElementById("menu");
+      const hud = document.getElementById("hud");
+      if (menu) menu.style.display = "block";
+      if (hud) hud.style.display = "none";
+      canvas.style.display = "none";
+      return;
+    }
+  }
+  drawMaze();
+}
+
 function setupCanvasAndMaze() {
-  // Definir el número deseado de celdas
-  const targetCols = 25;
-  const targetRows = 25;
+  // Limpiar intervalos anteriores
+  if (monsterInterval) {
+    clearInterval(monsterInterval);
+  }
+  monsters = [];
+  
+  // Obtener configuración del nivel actual (aleatorio)
+  const levelIndex = Math.floor(Math.random() * levels.length);
+  const level = levels[levelIndex];
+  currentLevel = levelIndex + 1;
   
   // Calcular el tamaño de celda basado en el espacio disponible
-  const maxW = Math.min(640, Math.floor(window.innerWidth * 0.9));
-  const maxH = Math.min(640, Math.floor(window.innerHeight * 0.7));
-  cellSize = Math.floor(Math.min(maxW / targetCols, maxH / targetRows));
-  cellSize = Math.max(18, Math.min(28, cellSize)); // ajustado para el nuevo tamaño
+  const maxW = Math.min(800, Math.floor(window.innerWidth * 0.9));
+  const maxH = Math.min(800, Math.floor(window.innerHeight * 0.8));
+  cellSize = Math.floor(Math.min(maxW / level.rows, maxH / level.rows));
+  cellSize = Math.max(16, Math.min(26, cellSize)); // ajustado para mejor visibilidad
 
-  // Ajustar el tamaño del canvas para que sea múltiplo exacto del tamaño de celda
-  cols = targetCols;
-  rows = targetRows;
+  // Establecer las dimensiones del laberinto
+  rows = level.rows;
+  cols = level.cols;
+
+  // Asegurar dimensiones impares para el laberinto
+  if (rows % 2 === 0) rows--;
+  if (cols % 2 === 0) cols--;
+
+  // Ajustar el tamaño del canvas
   canvas.width = cols * cellSize;
   canvas.height = rows * cellSize;
 
-  cols = Math.floor(canvas.width / cellSize);
-  rows = Math.floor(canvas.height / cellSize);
-
-  // asegurar impar
-  if (cols % 2 === 0) cols--;
-  if (rows % 2 === 0) rows--;
-
+  // Generar el laberinto con las dimensiones correctas
   maze = generateMaze(rows, cols);
 
   // Posición del jugador y meta: esquina superior izquierda y esquina inferior derecha (pasillos)
@@ -127,6 +253,20 @@ function drawMaze() {
   // Meta
   ctx.fillStyle = "green";
   ctx.fillRect(goal.x * cellSize, goal.y * cellSize, cellSize, cellSize);
+
+  // Dibujar monstruos
+  ctx.fillStyle = "#ff0000";
+  for (let monster of monsters) {
+    ctx.beginPath();
+    ctx.arc(
+      monster.x * cellSize + cellSize / 2,
+      monster.y * cellSize + cellSize / 2,
+      cellSize / 3,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
+  }
 
   // Jugador (imagen)
   ctx.drawImage(
@@ -157,7 +297,7 @@ function movePlayer(dx, dy) {
 
   if (player.x === goal.x && player.y === goal.y) {
     clearInterval(timerInterval);
-    alert(`¡Ganaste! Te quedaban ${time} segundos`);
+    alert(`¡Ganaste el nivel ${currentLevel}! Te quedaban ${time} segundos`);
     resetGame();
   }
 
@@ -169,16 +309,34 @@ function resetGame() {
   currentPlayerImg = playerImg; // Asegurar que mire al frente al iniciar
   lives = 3;
   time = 60;
+  
+  // Crear monstruos según el nivel
+  const level = levels[currentLevel - 1];
+  for (let i = 0; i < level.monsters; i++) {
+    monsters.push(createMonster());
+  }
+  
+  // Iniciar movimiento de monstruos si hay alguno
+  if (level.monsters > 0) {
+    monsterInterval = setInterval(moveMonsters, level.monsterSpeed);
+  }
+
+  // Actualizar la interfaz
   const livesEl = document.getElementById("lives");
   if (livesEl) livesEl.textContent = "Vidas: 3";
+  
   const timerEl = document.getElementById("timer");
   if (timerEl) timerEl.textContent = "Tiempo: " + time + "s";
-  clearInterval(timerInterval);
+  
+  // Reiniciar el temporizador
+  if (timerInterval) {
+    clearInterval(timerInterval);
+  }
+  
   timerInterval = setInterval(() => {
     time--;
     if (timerEl) timerEl.textContent = "Tiempo: " + time + "s";
     
-    // Verificar si se acabó el tiempo
     if (time <= 0) {
       clearInterval(timerInterval);
       alert("¡PERDISTE! Se acabó el tiempo");
