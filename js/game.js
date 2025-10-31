@@ -182,10 +182,21 @@ function moveMonsters() {
     if (monster.x === player.x && monster.y === player.y) {
       clearInterval(timerInterval);
       clearInterval(monsterInterval);
-      alert("¡Te atraparon los monstruos! Fin del juego.");
-      const menu = document.getElementById("menu");
+      
+      // Mostrar modal de Game Over
+      const gameOverModal = document.getElementById('gameOverModal');
       const hud = document.getElementById("hud");
-      if (menu) menu.style.display = "block";
+      
+      if (gameOverModal) {
+        gameOverModal.style.display = 'flex';
+        // Remover evento click anterior si existe
+        gameOverModal.onclick = () => {
+          gameOverModal.style.display = 'none';
+          if (hud) hud.style.display = "flex";
+          canvas.style.display = "block";
+          resetGame();
+        };
+      }
       if (hud) hud.style.display = "none";
       canvas.style.display = "none";
       return;
@@ -288,24 +299,7 @@ function movePlayer(dx, dy) {
   const newY = player.y + dy;
 
   if (isWall(newX, newY)) {
-    // Si toca pared, reducir vidas
-    lives--;
-    const livesEl = document.getElementById("lives");
-    if (livesEl) livesEl.textContent = "Vidas: " + lives;
-    
-    if (lives <= 0) {
-      clearInterval(timerInterval);
-      const gameOverModal = document.getElementById('gameOverModal');
-      if (gameOverModal) {
-        gameOverModal.style.display = 'flex';
-      }
-      const hud = document.getElementById("hud");
-      if (hud) hud.style.display = "none";
-      canvas.style.display = "none";
-      return;
-    }
-    player = { x: 1, y: 1 };
-    return;
+    return; // Si hay pared, simplemente no nos movemos
   }
 
   player.x = newX;
@@ -313,13 +307,24 @@ function movePlayer(dx, dy) {
 
   if (player.x === goal.x && player.y === goal.y) {
     clearInterval(timerInterval);
+    clearInterval(monsterInterval);
+    
     // Mostrar modal de victoria
     const victoriaModal = document.getElementById('victoriaModal');
-    const tiempoRestante = document.getElementById('tiempoRestante');
-    if (victoriaModal && tiempoRestante) {
-      tiempoRestante.textContent = time;
+    const hud = document.getElementById("hud");
+    
+    if (victoriaModal) {
       victoriaModal.style.display = 'flex';
+      // Remover evento click anterior si existe
+      victoriaModal.onclick = () => {
+        victoriaModal.style.display = 'none';
+        if (hud) hud.style.display = "flex";
+        canvas.style.display = "block";
+        resetGame();
+      };
     }
+    if (hud) hud.style.display = "none";
+    canvas.style.display = "none";
     return;
   }
 
@@ -361,12 +366,22 @@ function resetGame() {
     
     if (time <= 0) {
       clearInterval(timerInterval);
+      clearInterval(monsterInterval);
+      
       // Mostrar modal de Game Over
       const gameOverModal = document.getElementById('gameOverModal');
+      const hud = document.getElementById("hud");
+      
       if (gameOverModal) {
         gameOverModal.style.display = 'flex';
+        // Remover evento click anterior si existe
+        gameOverModal.onclick = () => {
+          gameOverModal.style.display = 'none';
+          if (hud) hud.style.display = "flex";
+          canvas.style.display = "block";
+          resetGame();
+        };
       }
-      const hud = document.getElementById("hud");
       if (hud) hud.style.display = "none";
       canvas.style.display = "none";
     }
