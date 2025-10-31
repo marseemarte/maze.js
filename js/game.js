@@ -18,8 +18,8 @@ const monsterImg = new Image();
 monsterImg.src = 'img/monster.png';
 
 // Efectos de sonido (coloca los archivos en audio/)
-const sfxWin = new Audio('ganaste2.mp3');
-const sfxLose = new Audio('PERDISTE2.mp3');
+const sfxWin = new Audio('sonidos/ganaste2.mp3');
+const sfxLose = new Audio('sonidos/PERDISTE2.mp3');
 // Ajustes por defecto
 sfxWin.volume = 0.9;
 sfxLose.volume = 0.9;
