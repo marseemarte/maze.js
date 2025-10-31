@@ -42,7 +42,7 @@
 .game-screen {
     width: 100%;
     aspect-ratio: 1;
-    background: #98FB98;
+    background: #000000;
     border: 8px solid #333;
     border-radius: 10px;
     display: flex;
@@ -70,7 +70,7 @@
 
 .game-text {
     font-family: 'Press Start 2P', cursive;
-    color: #000;
+    color: #ebb400;
     font-size: 24px;
     text-align: center;
     text-transform: uppercase;
