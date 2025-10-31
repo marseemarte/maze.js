@@ -180,26 +180,38 @@ function moveMonsters() {
     
     // Verificar colisión con el jugador
     if (monster.x === player.x && monster.y === player.y) {
-      clearInterval(timerInterval);
-      clearInterval(monsterInterval);
-      
-      // Mostrar modal de Game Over
-      const gameOverModal = document.getElementById('gameOverModal');
-      const hud = document.getElementById("hud");
-      
-      if (gameOverModal) {
-        gameOverModal.style.display = 'flex';
-        // Remover evento click anterior si existe
-        gameOverModal.onclick = () => {
-          gameOverModal.style.display = 'none';
-          if (hud) hud.style.display = "flex";
-          canvas.style.display = "block";
-          resetGame();
-        };
+      // Reducir vida en lugar de reiniciar inmediatamente
+      lives--;
+      const livesEl = document.getElementById("lives");
+      if (livesEl) livesEl.textContent = "Vidas: " + lives;
+
+      if (lives <= 0) {
+        // Si ya no quedan vidas: fin del juego
+        clearInterval(timerInterval);
+        clearInterval(monsterInterval);
+
+        const gameOverModal = document.getElementById('gameOverModal');
+        const hud = document.getElementById("hud");
+        if (gameOverModal) {
+          gameOverModal.style.display = 'flex';
+          gameOverModal.onclick = () => {
+            gameOverModal.style.display = 'none';
+            if (hud) hud.style.display = "flex";
+            canvas.style.display = "block";
+            resetGame();
+          };
+        }
+        if (hud) hud.style.display = "none";
+        canvas.style.display = "none";
+        return;
+      } else {
+        // Si quedan vidas: devolver al jugador a la posición inicial y continuar
+        player = { x: 1, y: 1 };
+        drawMaze();
+        // No detener intervalos: los monstruos siguen activos
+        // Evitar procesar colisiones adicionales inmediatamente
+        // (si quieres invulnerabilidad temporal, podemos añadirla más tarde)
       }
-      if (hud) hud.style.display = "none";
-      canvas.style.display = "none";
-      return;
     }
   }
   drawMaze();
@@ -351,6 +363,8 @@ function resetGame() {
   // Actualizar la interfaz
   const livesEl = document.getElementById("lives");
   if (livesEl) livesEl.textContent = "Vidas: 3";
+  const levelEl = document.getElementById("level");
+  if (levelEl) levelEl.textContent = "Nivel: " + currentLevel;
   
   const timerEl = document.getElementById("timer");
   if (timerEl) timerEl.textContent = "Tiempo: " + time + "s";
