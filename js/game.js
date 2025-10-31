@@ -17,6 +17,13 @@ let monsterInterval = null;
 const monsterImg = new Image();
 monsterImg.src = 'img/monster.png';
 
+// Efectos de sonido (coloca los archivos en audio/)
+const sfxWin = new Audio('ganaste2.mp3');
+const sfxLose = new Audio('PERDISTE2.mp3');
+// Ajustes por defecto
+sfxWin.volume = 0.9;
+sfxLose.volume = 0.9;
+
 // Configuración de niveles
 const levels = [
   { 
@@ -180,26 +187,43 @@ function moveMonsters() {
     
     // Verificar colisión con el jugador
     if (monster.x === player.x && monster.y === player.y) {
-      clearInterval(timerInterval);
-      clearInterval(monsterInterval);
-      
-      // Mostrar modal de Game Over
-      const gameOverModal = document.getElementById('gameOverModal');
-      const hud = document.getElementById("hud");
-      
-      if (gameOverModal) {
-        gameOverModal.style.display = 'flex';
-        // Remover evento click anterior si existe
-        gameOverModal.onclick = () => {
-          gameOverModal.style.display = 'none';
-          if (hud) hud.style.display = "flex";
-          canvas.style.display = "block";
-          resetGame();
-        };
+      // Reducir vida en lugar de reiniciar inmediatamente
+      lives--;
+      const livesEl = document.getElementById("lives");
+      if (livesEl) livesEl.textContent = "Vidas: " + lives;
+
+      if (lives <= 0) {
+        // Si ya no quedan vidas: fin del juego
+        clearInterval(timerInterval);
+        clearInterval(monsterInterval);
+
+        // reproducir sonido de derrota (intentar, si el usuario ya interactuó se permitirá)
+        try { sfxLose.currentTime = 0; sfxLose.play(); } catch(e) {}
+
+        const gameOverModal = document.getElementById('gameOverModal');
+        const hud = document.getElementById("hud");
+        if (gameOverModal) {
+          gameOverModal.style.display = 'flex';
+          // asignar click que detenga el sonido y reinicie
+          gameOverModal.onclick = () => {
+            try { sfxLose.pause(); sfxLose.currentTime = 0; } catch(e) {}
+            gameOverModal.style.display = 'none';
+            if (hud) hud.style.display = "flex";
+            canvas.style.display = "block";
+            resetGame();
+          };
+        }
+        if (hud) hud.style.display = "none";
+        canvas.style.display = "none";
+        return;
+      } else {
+        // Si quedan vidas: devolver al jugador a la posición inicial y continuar
+        player = { x: 1, y: 1 };
+        drawMaze();
+        // No detener intervalos: los monstruos siguen activos
+        // Evitar procesar colisiones adicionales inmediatamente
+        // (si quieres invulnerabilidad temporal, podemos añadirla más tarde)
       }
-      if (hud) hud.style.display = "none";
-      canvas.style.display = "none";
-      return;
     }
   }
   drawMaze();
@@ -311,9 +335,12 @@ function movePlayer(dx, dy) {
     const hud = document.getElementById("hud");
     
     if (victoriaModal) {
+      // reproducir sonido de victoria
+      try { sfxWin.currentTime = 0; sfxWin.play(); } catch(e) {}
       victoriaModal.style.display = 'flex';
-      // Remover evento click anterior si existe
+      // asignar click que detenga el sonido y reinicie
       victoriaModal.onclick = () => {
+        try { sfxWin.pause(); sfxWin.currentTime = 0; } catch(e) {}
         victoriaModal.style.display = 'none';
         if (hud) hud.style.display = "flex";
         canvas.style.display = "block";
@@ -348,9 +375,14 @@ function resetGame() {
   // Actualizar la interfaz
   const livesEl = document.getElementById("lives");
   if (livesEl) livesEl.textContent = "Vidas: 3";
+  const levelEl = document.getElementById("level");
+  if (levelEl) levelEl.textContent = "Nivel: " + currentLevel;
   
   const timerEl = document.getElementById("timer");
   if (timerEl) timerEl.textContent = "Tiempo: " + time + "s";
+  // detener/rewindear efectos de sonido si estaban sonando
+  try { sfxWin.pause(); sfxWin.currentTime = 0; } catch(e) {}
+  try { sfxLose.pause(); sfxLose.currentTime = 0; } catch(e) {}
   
   // Reiniciar el temporizador
   if (timerInterval) {
@@ -364,15 +396,18 @@ function resetGame() {
     if (time <= 0) {
       clearInterval(timerInterval);
       clearInterval(monsterInterval);
-      
+      // reproducir sonido de derrota
+      try { sfxLose.currentTime = 0; sfxLose.play(); } catch(e) {}
+
       // Mostrar modal de Game Over
       const gameOverModal = document.getElementById('gameOverModal');
       const hud = document.getElementById("hud");
       
       if (gameOverModal) {
         gameOverModal.style.display = 'flex';
-        // Remover evento click anterior si existe
+        // asignar click que detenga el sonido y reinicie
         gameOverModal.onclick = () => {
+          try { sfxLose.pause(); sfxLose.currentTime = 0; } catch(e) {}
           gameOverModal.style.display = 'none';
           if (hud) hud.style.display = "flex";
           canvas.style.display = "block";
