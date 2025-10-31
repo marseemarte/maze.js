@@ -290,17 +290,14 @@ function drawMaze() {
   ctx.fillRect(goal.x * cellSize, goal.y * cellSize, cellSize, cellSize);
 
   // Dibujar monstruos
-  ctx.fillStyle = "#ff0000";
   for (let monster of monsters) {
-    ctx.beginPath();
-    ctx.arc(
-      monster.x * cellSize + cellSize / 2,
-      monster.y * cellSize + cellSize / 2,
-      cellSize / 3,
-      0,
-      Math.PI * 2
+    ctx.drawImage(
+      monsterImg,
+      monster.x * cellSize,
+      monster.y * cellSize,
+      cellSize,
+      cellSize
     );
-    ctx.fill();
   }
 
   // Jugador (imagen)
